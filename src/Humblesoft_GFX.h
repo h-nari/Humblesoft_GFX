@@ -23,10 +23,10 @@ class Humblesoft_GFX : public Adafruit_GFX {
   size_t write(uint8_t);
   virtual uint16_t colorRGB(uint8_t r, uint8_t g, uint8_t b) = 0;
   void posPrintf(int16_t x,int16_t y,const char *fmt,...)
-    __attribute__ ((format (print,3,4)));
+    __attribute__ ((format (printf,4,5)));
   void alignPrintf(int16_t x,int16_t y,TextAlign hAlign,
 		   TextAlign vAlign,const char *fmt,...)
-    __attribute__ ((format (print,5,6)));
+    __attribute__ ((format (printf,6,7)));
   
  protected:
   void process_utf8_byte(uint8_t c, int16_t *pX, int16_t *pY,
@@ -36,7 +36,7 @@ class Humblesoft_GFX : public Adafruit_GFX {
 		      uint16_t cx, uint16_t cy,
 		      uint8_t textsize, boolean wrap,
 		      uint16_t textcolor, uint16_t textbgcolor);
-  void virtual lineFeedHook(int16_t *px, int16_t *py, int16_t h) {}
+  void virtual lineFeedHook(int16_t *, int16_t *, int16_t) {}
 
 };
 

@@ -86,7 +86,6 @@ void Humblesoft_GFX::process_utf8_byte(uint8_t c, int16_t *pX, int16_t *pY,
   uint32_t ucode;
   const uint8_t *glyph;
   uint8_t w,h;
-  uint32_t sjis;
   uint8_t s = textsize < 1 ? 0 : textsize;
   
   if(pX2) *pX2 = *pX;
@@ -117,7 +116,7 @@ void Humblesoft_GFX::process_utf8_byte(uint8_t c, int16_t *pX, int16_t *pY,
 void
 Humblesoft_GFX::drawFontxGlyph(const uint8_t *glyph,uint8_t w,uint8_t h,
 			       uint16_t cx, uint16_t cy,
-			       uint8_t textsize, boolean wrap,
+			       uint8_t textsize, boolean /* wrap */,
 			       uint16_t textcolor, uint16_t textbgcolor)
 {
   const uint8_t *gp;
@@ -207,6 +206,10 @@ void Humblesoft_GFX::alignPrintf(int16_t x,int16_t y,TextAlign hAlign,
   va_end(ap);
 
   getTextBounds(buf, 0, 0, &tx, &ty, &tw, &th);
+  
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wswitch"
+  
   switch(hAlign){
   case TA_LEFT:    			break;
   case TA_CENTER:	x -= tw/2;    	break;
@@ -217,6 +220,8 @@ void Humblesoft_GFX::alignPrintf(int16_t x,int16_t y,TextAlign hAlign,
   case TA_CENTER:	y -= th/2;	break;
   case TA_BOTTOM:	y -= th/2;	break;
   }
+
+#pragma GCC diagnostic pop  
   setCursor(x,y);
   print(buf);
 }
