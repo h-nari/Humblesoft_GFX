@@ -218,7 +218,7 @@ void Humblesoft_GFX::alignPrintf(int16_t x,int16_t y,TextAlign hAlign,
   switch(vAlign){
   case TA_TOP:				break;
   case TA_CENTER:	y -= th/2;	break;
-  case TA_BOTTOM:	y -= th/2;	break;
+  case TA_BOTTOM:	y -= th;	break;
   }
 
 #pragma GCC diagnostic pop  

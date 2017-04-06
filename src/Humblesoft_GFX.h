@@ -21,12 +21,17 @@ class Humblesoft_GFX : public Adafruit_GFX {
   void getTextBounds(char *string, int16_t x, int16_t y,
 		     int16_t *x1, int16_t *y1, uint16_t *w, uint16_t *h);
   size_t write(uint8_t);
-  virtual uint16_t colorRGB(uint8_t r, uint8_t g, uint8_t b) = 0;
+  virtual uint16_t rgb(uint8_t r, uint8_t g, uint8_t b) {
+    return ((r & 0xf8) << 8)|((g & 0xfc) << 3)|((b & 0xfc) >> 3);// R:5,G:6,B:5
+  }
+  uint16_t rgb(uint32_t d){
+    return rgb(d >> 16, d >> 8, d);
+  }
   void posPrintf(int16_t x,int16_t y,const char *fmt,...)
-    __attribute__ ((format (printf,4,5)));
+    __attribute__ ((format (printf, 4, 5)));
   void alignPrintf(int16_t x,int16_t y,TextAlign hAlign,
 		   TextAlign vAlign,const char *fmt,...)
-    __attribute__ ((format (printf,6,7)));
+    __attribute__ ((format (printf, 6, 7)));
   
  protected:
   void process_utf8_byte(uint8_t c, int16_t *pX, int16_t *pY,
