@@ -97,7 +97,7 @@ void Humblesoft_GFX::process_utf8_byte(uint8_t c, int16_t *pX, int16_t *pY,
     *pX = 0;
     lineFeedHook(pX, pY, (h + m_spaceY) * s);
   }
-  else {
+  else if(c != '\r'){
     if(m_u8d.decode(c, &ucode) && m_fontx->getGlyph(ucode, &glyph, &w, &h)){
       if(wrap && (*pX + (w + m_spaceX) * s > _width)){
 	*pX = 0;
@@ -115,14 +115,14 @@ void Humblesoft_GFX::process_utf8_byte(uint8_t c, int16_t *pX, int16_t *pY,
 
 void
 Humblesoft_GFX::drawFontxGlyph(const uint8_t *glyph,uint8_t w,uint8_t h,
-			       uint16_t cx, uint16_t cy,
+			       int16_t cx, int16_t cy,
 			       uint8_t textsize, boolean /* wrap */,
 			       uint16_t textcolor, uint16_t textbgcolor)
 {
   const uint8_t *gp;
   uint8_t x,y;
   uint16_t xp, yp;
-  uint8_t s = textsize < 1 ? 0 : textsize;
+  uint8_t s = textsize < 1 ? 1 : textsize;
 
   if(glyph == NULL) return;
   
@@ -226,4 +226,55 @@ void Humblesoft_GFX::alignPrintf(int16_t x,int16_t y,TextAlign hAlign,
   print(buf);
 }
 
+
+static const struct {
+  const char 	*name;
+  uint32_t	value;
+} color_names[] = {
+  "black",	0x000000,
+  "white",	0xffffff,
+  "red",	0xff0000,
+  "green",	0x00ff00,
+  "blue",	0x0000ff,
+  "yellow",	0xffff00,
+  "purple",	0xff00ff,
+  "cyan",	0x00ffff,
+  "magenta",	0xff00ff,
+  "navy",	0x000080,
+  "darkgreen",	0x008000,
+  "darkcyan",	0x008080,
+  "maroon",	0x800000,
+  "olive",	0x808000,
+  "lightgrey",	0xc0c0c0,
+  "darkgray",	0x808080,
+  "orange",	0xffa500,
+  "greenyellow",0xadff3f,
+  "pink",	0xffc0cb,
+};
+
+uint16_t Humblesoft_GFX::rgb(const char *color)
+{
+  if(color[0] == '#'){
+    char *p;
+    long v = strtol(color+1, &p, 16);
+    if(p - color == 7)
+      return rgb((uint32_t)v);
+    else if(p - color == 4)
+      return rgb((v >> 8)&0xff, (v>>4)&0xff, v &0xff);
+    else {
+      Serial.printf("color value \"%s\" is not correct.\n", color);
+      return rgb(0x707070);
+    }
+  }
+  else {
+    for(uint16_t i=0; i<sizeof(color_names)/sizeof(color_names[0]);i++){
+      if(stricmp(color, color_names[i].name)==0){
+	return rgb(color_names[i].value);
+
+      }
+    }
+    Serial.printf("color name \"%s\" not defined.\n", color);
+    return rgb(0x808080);
+  }
+}
 
