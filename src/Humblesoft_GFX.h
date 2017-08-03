@@ -30,6 +30,7 @@ class Humblesoft_GFX : public Adafruit_GFX {
     setCursor(0,0);
     setTextColor(0xffff);
     setTextSize(1);
+    setFont();
   }
 
   uint16_t color565(uint8_t r, uint8_t g, uint8_t b) { return(rgb(r,g,b));}
