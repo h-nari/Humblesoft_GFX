@@ -3,145 +3,132 @@ arduino library, inherit Adafruit_GFX, expand functions, Kanji Font drawing ...
 
 Arduino用ライブラリ, Adafruit_GFXを継承し漢字描画機能等を拡張。
 
-## Humblesoft_GFXクラスのメソッド一覧
+## 関連文書
 
+* <a href="https://github.com/h-nari/Humblesoft_GFX/blob/master/doc/adafruit_gfx_programming.md">Adafruit_GFXのプログラミング</a>
+* <a href="https://github.com/h-nari/Humblesoft_GFX/blob/master/doc/methods.md">Adafruit_GFX,Humblesoft_GFXのメソッド一覧</a>
+
+## 概要
+
+<img src="https://github.com/h-nari/Humblesoft_GFX/blob/master/img/fig171030a1.png?raw=true&2">
+
+Humblesoft_GFXクラスは、Adafruit社提供のAdafruit_GFXクラスに
+日本語描画機能と、いくつかの便利な機能を追加したクラスです。
+
+Adafruit_GFXクラスは、様々なグラフィック表示デバイス（小型液晶やOLED等）のライブラリのクラスの親クラスで、図形や文字の描画機能を提供します。
+ただし、漢字ひらがな等の日本語描画機能はありませんので、それを追加した
+クラスHumblesoft_GFXクラスを作成しました。
+Humblesoft_GFXを親クラスとすることで、日本語描画機能つきのライブラリを
+各種グラフィック表示デバイス向けに用意に作成することができます。
+
+Humblesoft_GFXを使用しているグラフィックデバイスライブラリの例
+
+* [h-nari/Humblesoft_LedMat:](https://github.com/h-nari/Humblesoft_LedMat "h-nari/Humblesoft_LedMat: arduino library for Humblesoft Led Matrix controller with esp8266")
+* [h-nari/Humblesoft_ILI9341](https://github.com/h-nari/Humblesoft_ILI9341 "h-nari/Humblesoft_ILI9341: add some functions to Adaruit_ILI9341")
+* [h-nari/Humblesoft_SSD1306](https://github.com/h-nari/Humblesoft_SSD1306 "h-nari/Humblesoft_SSD1306: arduino library for SSD1306, inherit Adafruit_SSD1306 add Kanji drawing feature")
+
+以下では、Adafruit_GFXの使い方(描画方法)、Humblesoft_GFXクラスで拡張された機能
+について説明します。
+
+## Adafruit_GFXでの描画方法
+
+- doc/adafruit_gfx_programming.md を御覧ください。
+
+## Humblesoft_GFXで拡張された機能
+
+### 日本語の描画
+
+FONTX形式のフォントを使用して、
+日本語（漢字、平仮名、カタカナ等）の描画ができます。
+
+新たに```Fontx```というクラスを作成し、setFont()メソッドで
+指定することにより、print(),println(),printf()メソッドで
+日本語を描画することができます。文字列のエンコーディングは
+utf-8で行います。
+
+Fontxクラスはインターフェースを定義するための抽象クラスで、
+実際にはRomFontx , FsFontxクラスでフォントを使用します。
+
+RomFontxは、フォントのデータをプログラム中に配置し、
+ROMに書き込みます。プログラムのサイズが大きくなり、
+書込に時間がかかるようになるという欠点はありますが、
+簡単に使用できます。
+
+FsFontxは、フォントのデータを<a href="https://github.com/esp8266/Arduino/blob/master/doc/filesystem.rst">ROM上に作成されたFileSystem</a>から読み出して
+使用します。プログラムのサイズが大きくならないので、
+書込時間が長くならないというメリットがありますが、
+フォントデータをFileSystemに書き込む必要があります。
+
+Fontxクラスの詳細については、
+<a href="https://github.com/h-nari/Fontx">
+Fontxのgithubのページ</a>に書いていく予定です。
+
+### 色指定の方法
+
+Adafruit_GFXクラスでは、色の指定に 数値(uint16_t)の値で
+指定する方法しかなく、少し面倒です。
+そこで、色名の文字列で色指定できる方法を準備しました。
+文字列を Red:5bit, Green:6bit, Blue:5bitの16bitの値に
+変換します。
+
+使用できる色指定は、色名か #rrggbb という形式の '#'で始まり、
+6桁の16進数が続く形式です。
+
+色名としては、以下のものが使用できます。
+大文字でも小文字でも構いません。
+
+black, white, red, green, blue, yellow, purple, cyan, magenta, navy,darkgreen, darkcyan, maroon, olive, lightgrey, darkgray, orange, greenyellow, pink
+
+文字列による色指定は、下記のメソッドで使用できます。
+図形描画に関しては、使用頻度が高い fillScreen()と
+fillRect()でのみ使用できます。
 
 ``` c
-// 画面全体をクリア
-void clear();
-
-// RGB各成分からcolor値の計算  
-uint16_t color565(uint8_t r, uint8_t g, uint8_t b);
-
-// RGB各成分からcolor値の計算、color565()と同じ
-static uint16_t rgb(uint32_t d);
-
-// カラー名(eg. "red"や"#ff0000")からcolor値の計算
-static uint16_t rgb(const char *color);
-
-// 文字色を色名の文字列で指定
-void setTextColor(const char *color);
-void setTextColor(const char *fg, const char *bg);
-
-// 色名文字列版の描画メソッド
-void fillScreen(const char *color);
-void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, const char *color);
-
-// 文字位置指定付き printf
-void posPrintf(int16_t x,int16_t y,const char *fmt,...);
-
-// 文字位置＋align機能付き printf
-void alignPrintf(int16_t x,int16_t y,TextAlign hAlign,TextAlign vAlign,const char *fmt,...);
-
-// 文字描画位置の相対移動
-void moveCursor(int16_t rx, int16_t ry);
-```    
-
-## Adafruit_GFXクラスのメソッド一覧
-
-``` c
-// ドットの描画
-void drawPixel(int16_t x, int16_t y, uint16_t color);
-
-// 直線の描画
-virtual void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color);
-
-// 垂直線の描画
-virtual void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
-
-// 水平線の描画
-virtual void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
-
-// 長方形の描画（枠だけ）
-virtual void drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
-
-// 長方形の塗り潰し
-virtual void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
-
-// 画面全体の塗り潰し
-virtual void fillScreen(uint16_t color);
-
-// 描画色()前景色と背景色)の反転
-virtual void invertDisplay(boolean i);
-
-// 円の描画
-void drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color);
-
-// 円の塗り潰し
-void fillCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color);
-
-// 三角形の描画
-void drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
-int16_t x2, int16_t y2, uint16_t color);
-
-// 三角形の塗り潰し
-void fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1,int16_t x2, int16_t y2, uint16_t color);
-
-// 角丸長方形の描画
-void drawRoundRect(int16_t x0, int16_t y0, int16_t w, int16_t h,int16_t radius, uint16_t color);
-
-// 角丸長方形の塗り潰し
-void fillRoundRect(int16_t x0, int16_t y0, int16_t w, int16_t h,int16_t radius, uint16_t color);
-
-// ビットマップの描画
-void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap,int16_t w, int16_t h, uint16_t color);
-
-void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap,int16_t w, int16_t h, uint16_t color, uint16_t bg);
-
-void drawBitmap(int16_t x, int16_t y, uint8_t *bitmap,int16_t w, int16_t h, uint16_t color);
-
-void drawBitmap(int16_t x, int16_t y, uint8_t *bitmap,
-int16_t w, int16_t h, uint16_t color, uint16_t bg);
-
-//
-void drawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap,int16_t w, int16_t h, uint16_t color);
-
-// 文字の描画
-void drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color,uint16_t bg, uint8_t size);
-
-// write()での文字描画位置指定
-void setCursor(int16_t x, int16_t y),
-
-// 文字色の指定（背景は透明)
-void setTextColor(uint16_t c);
-
-// 文字色の指定（背景色も指定)
-void setTextColor(uint16_t c, uint16_t bg);
-
-// 文字サイズの指定
-void setTextSize(uint8_t s);
-
-// 行折り曲げの指定
-void setTextWrap(boolean w);
-
-// 描画方向の指定
-void setRotation(uint8_t r);
-
-// 文字セットの指定
-void cp437(boolean x=true);
-
-// フォントの設定
-void setFont(const GFXfont *f = NULL);
-
-// 文字列のサイズの取得
-void getTextBounds(char *string, int16_t x, int16_t y,int16_t *x1, int16_t *y1, uint16_t *w, uint16_t *h);
-void getTextBounds(const __FlashStringHelper *s, int16_t x, int16_t y,int16_t *x1, int16_t *y1, uint16_t *w, uint16_t *h);
-
-// 文字の描画
-size_t write(uint8_t);
-
-// 画面高さの取得(rotationの影響を受ける)
-int16_t height(void) const;
-
-// 画面幅の取得（rotationの影響を受ける)
-int16_t width(void) const;
-
-// 描画方向の取得
-uint8_t getRotation(void) const;
-
-// 文字描画x座標の取得
-int16_t getCursorX(void) const;
-
-// 文字描画y座標の取得
-int16_t getCursorY(void) const;
+  static uint16_t rgb(const char *color);
+  void setTextColor(const char *color);
+  void setTextColor(const char *fg, const char *bg);
+  void fillScreen(const char *color);
+  void fillRect(int16_t x, int16_t y, int16_t w, int16_t h,const char *color);
 ```
+
+### 位置決め付き文字列描画
+
+posPrintf()は、位置指定機能付きprintf()で、setCursor() + printf()と同じことをします。
+
+``` c
+  void posPrintf(int16_t x,int16_t y,const char *fmt,...);
+```
+
+printf()でデフォルトフォントやFontxのフォントを描画すると
+文字列の左位置が指定位置となりますが、
+alignPrintf()では、位置指定する文字列の基準位置も指定することができます。
+
+水平方向と垂直方向それぞれに指定することができ、
+水平方向は ```TA_LEFT, TA_CENTER, TA_RIGHT``` から、
+垂直方向は ```TA_TOP, TA_CENTER, TA_BOTTOM``` から
+指定することが出来ます。
+
+``` c
+  enum TextAlign { TA_NONE, TA_LEFT, TA_CENTER, TA_RIGHT, TA_TOP, TA_BOTTOM};
+  void alignPrintf(int16_t x,int16_t y,TextAlign hAlign, TextAlign vAlign,const char *fmt,...);
+```
+
+### 文字列描画位置の相対移動
+
+カーソル位置（文字列描画位置）は
+setCursor()メソッドで設定できますが、
+現在の位置からの相対位置に動かそうとすると
+getCursorX(),getCursorY()なども使わなければ
+ならず、若干面倒です。
+
+そこでmoveCursor()メソッドを用意しました。
+
+``` c
+void moveCursor(int16_t rx, int16_t ry);
+```
+
+# 今後
+
+なにか便利な機能があれば、
+今後もHumblesoft_GFXに追加していく
+つもりです。
