@@ -1,4 +1,4 @@
-# Humbllesoft_GFX
+# Humblesoft_GFX
 arduino library, inherit Adafruit_GFX, expand functions, Kanji Font drawing ...
 
 Arduino用ライブラリ, Adafruit_GFXを継承し漢字描画機能等を拡張。
