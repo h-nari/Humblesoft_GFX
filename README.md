@@ -5,7 +5,7 @@ Arduino用ライブラリ, Adafruit_GFXを継承し漢字描画機能等を拡�
 
 ## 関連文書
 
-* <a href="https://github.com/h-nari/Humblesoft_GFX/blob/master/doc/adafruit_gfx_programming.md">Adafruit_GFXのプログラミング</a>
+* <a href="https://github.com/h-nari/Humblesoft_GFX/blob/master/doc/adafruit_gfx_programing.md">Adafruit_GFXのプログラミング</a>
 * <a href="https://github.com/h-nari/Humblesoft_GFX/blob/master/doc/methods.md">Adafruit_GFX,Humblesoft_GFXのメソッド一覧</a>
 
 ## 概要
