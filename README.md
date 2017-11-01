@@ -7,6 +7,7 @@ Arduino用ライブラリ, Adafruit_GFXを継承し漢字描画機能等を拡�
 
 * <a href="https://github.com/h-nari/Humblesoft_GFX/blob/master/doc/adafruit_gfx_programing.md">Adafruit_GFXのプログラミング</a>
 * <a href="https://github.com/h-nari/Humblesoft_GFX/blob/master/doc/methods.md">Adafruit_GFX,Humblesoft_GFXのメソッド一覧</a>
+* <a href="https://github.com/h-nari/Fontx">github h-nari/Fontx</a>
 
 ## 概要
 
@@ -61,7 +62,7 @@ FsFontxは、フォントのデータを<a href="https://github.com/esp8266/Ardu
 
 Fontxクラスの詳細については、
 <a href="https://github.com/h-nari/Fontx">
-Fontxのgithubのページ</a>に書いていく予定です。
+Fontxのgithubのページ</a>を御覧ください。
 
 ### 色指定の方法
 
