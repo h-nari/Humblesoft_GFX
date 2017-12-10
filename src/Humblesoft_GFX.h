@@ -18,7 +18,7 @@ class Humblesoft_GFX : public Adafruit_GFX {
   Humblesoft_GFX(int16_t w, int16_t h);
   void setFont(Fontx *fontx);
   void setFont(const GFXfont *f = NULL);
-  void getTextBounds(char *string, int16_t x, int16_t y,
+  void getTextBounds(const char *string, int16_t x, int16_t y,
 		     int16_t *x1, int16_t *y1, uint16_t *w, uint16_t *h);
   size_t write(uint8_t);
   static uint16_t rgb(uint8_t r, uint8_t g, uint8_t b) {

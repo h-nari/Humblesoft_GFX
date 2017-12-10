@@ -146,14 +146,14 @@ Humblesoft_GFX::drawFontxGlyph(const uint8_t *glyph,uint8_t w,uint8_t h,
 }
 
 
-void Humblesoft_GFX::getTextBounds(char *string, int16_t x0, int16_t y0,
+void Humblesoft_GFX::getTextBounds(const char *string, int16_t x0, int16_t y0,
 				   int16_t *x1, int16_t *y1,
 				   uint16_t *w, uint16_t *h)
 {
   if(!m_fontx)
-    Adafruit_GFX::getTextBounds(string, x0, y0, x1, y1, w, h);
+    Adafruit_GFX::getTextBounds((char *)string, x0, y0, x1, y1, w, h);
   else {
-    char *p = string;
+    const char *p = string;
     int16_t x,y,max_x,max_y,min_x,min_y,x2;
 
     x = min_x = max_x = x2 = x0;
