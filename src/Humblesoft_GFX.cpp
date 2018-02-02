@@ -206,6 +206,9 @@ void Humblesoft_GFX::alignPrintf(int16_t x,int16_t y,TextAlign hAlign,
   va_end(ap);
 
   getTextBounds(buf, 0, 0, &tx, &ty, &tw, &th);
+
+  x -= tx;
+  y -= ty;
   
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wswitch"
