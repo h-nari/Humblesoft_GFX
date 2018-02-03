@@ -262,9 +262,12 @@ uint16_t Humblesoft_GFX::rgb(const char *color)
     long v = strtol(color+1, &p, 16);
     if(p - color == 7)
       return rgb((uint32_t)v);
-    else if(p - color == 4)
-      return rgb((v >> 8)&0xff, (v>>4)&0xff, v &0xff);
-    else {
+    else if(p - color == 4) {
+      uint8_t r = (v >> 8) & 0x0f;
+      uint8_t g = (v >> 4) & 0x0f;
+      uint8_t b = v & 0x0f;
+      return rgb(r*16+r, g*16+g, b*16+b);
+    } else {
       Serial.printf("color value \"%s\" is not correct.\n", color);
       return rgb(0x707070);
     }
