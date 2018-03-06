@@ -274,7 +274,7 @@ uint16_t Humblesoft_GFX::rgb(const char *color)
   }
   else {
     for(uint16_t i=0; i<sizeof(color_names)/sizeof(color_names[0]);i++){
-      if(stricmp(color, color_names[i].name)==0){
+      if(strcasecmp(color, color_names[i].name)==0){
 	return rgb(color_names[i].value);
 
       }
