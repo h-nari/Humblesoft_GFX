@@ -25,7 +25,7 @@ class Humblesoft_GFX : public Adafruit_GFX {
     return ((r & 0xf8) << 8)|((g & 0xfc) << 3)|((b & 0xfc) >> 3);// R:5,G:6,B:5
   }
 
-  void clear() {
+  void virtual clear() {
     fillScreen((uint16_t)0x0000);
     setCursor(0,0);
     setTextColor(0xffff);
