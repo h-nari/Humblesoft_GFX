@@ -84,11 +84,13 @@ class Humblesoft_GFX : public Adafruit_GFX {
   }
  protected:
   void process_utf8_byte(uint8_t c, int16_t *pX, int16_t *pY,
-			 uint8_t textsize, bool wrap, uint16_t fg, uint16_t bg,
+			 uint8_t textsize_x, uint8_t textsize_y,
+			 bool wrap, uint16_t fg, uint16_t bg,
 			 bool bDraw = true, int16_t *pX2 = NULL);
   virtual void drawFontxGlyph(const uint8_t *glyph,uint8_t w,uint8_t h,
 			      int16_t cx, int16_t cy,
-			      uint8_t textsize, boolean wrap,
+			      uint8_t textsize_x, uint8_t textsize_y,
+			      boolean wrap,
 			      uint16_t textcolor, uint16_t textbgcolor);
   virtual void lineFeedHook(int16_t *, int16_t *, int16_t) {}
 

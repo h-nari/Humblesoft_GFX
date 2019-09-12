@@ -26,24 +26,25 @@ size_t Humblesoft_GFX::write(uint8_t c)
   if(!m_fontx) {
     if(!gfxFont) { // 'Classic' built-in font
       if(c == '\n') {
-	cursor_y += textsize*(m_spaceY + 8);
+	cursor_y += textsize_y*(m_spaceY + 8);
 	cursor_x  = 0;
-	lineFeedHook(&cursor_x, &cursor_y, textsize*(m_spaceY+8));
+	lineFeedHook(&cursor_x, &cursor_y, textsize_y*(m_spaceY+8));
       } else if(c == '\r') {
 	// skip em
       } else {
-	if(wrap && ((cursor_x + textsize * 6) >= _width)) { // Heading off edge?
+	if(wrap && ((cursor_x + textsize_x * 6) >= _width)){ //Heading off edge?
 	  cursor_x  = 0;            // Reset x to zero
-	  cursor_y += textsize * 8; // Advance y one line
-	  lineFeedHook(&cursor_x, &cursor_y, textsize*8);
+	  cursor_y += textsize_y * 8; // Advance y one line
+	  lineFeedHook(&cursor_x, &cursor_y, textsize_y*8);
 	}
-	drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
-	cursor_x += textsize * 6;
+	drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor,
+		 textsize_x, textsize_y);
+	cursor_x += textsize_x * 6;
       }
     } else { // Custom font
       if(c == '\n') {
 	cursor_x  = 0;
-	int16_t lh = (int16_t)textsize *
+	int16_t lh = (int16_t)textsize_y *
 	  ((uint8_t)pgm_read_byte(&gfxFont->yAdvance) + m_spaceY); 
 	cursor_y += lh;
 	lineFeedHook(&cursor_x, &cursor_y, lh);
@@ -57,57 +58,60 @@ size_t Humblesoft_GFX::write(uint8_t c)
 	  uint8_t h = pgm_read_byte(&glyph->height);
 	  if((w > 0) && (h > 0)) { // Is there an associated bitmap?
 	    int16_t xo = (int8_t)pgm_read_byte(&glyph->xOffset); // sic
-	    if(wrap && ((cursor_x + textsize * (xo + w)) >= _width)) {
+	    if(wrap && ((cursor_x + textsize_x * (xo + w)) >= _width)) {
 	      // Drawing character would go off right edge; wrap to new line
 	      cursor_x  = 0;
-	      cursor_y += (int16_t)textsize *
+	      cursor_y += (int16_t)textsize_y *
 		(uint8_t)pgm_read_byte(&gfxFont->yAdvance);
 	    }
-	    drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
+	    drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor,
+		     textsize_x, textsize_y);
 	  }
-	  cursor_x += pgm_read_byte(&glyph->xAdvance) * (int16_t)textsize;
+	  cursor_x += pgm_read_byte(&glyph->xAdvance) * (int16_t)textsize_x;
 	}
       }
     }
     
   } else {
-    process_utf8_byte(c, &cursor_x, &cursor_y, textsize, wrap, textcolor,
-		      textbgcolor);
+    process_utf8_byte(c, &cursor_x, &cursor_y, textsize_x, textsize_y, wrap,
+		      textcolor, textbgcolor);
   }
   return 1;
 }
 
 
 void Humblesoft_GFX::process_utf8_byte(uint8_t c, int16_t *pX, int16_t *pY,
-				 uint8_t textsize, bool wrap,
-				 uint16_t fg, uint16_t bg,
-				 bool bDraw, int16_t *pX2)
+				       uint8_t textsize_x, uint8_t textsize_y,
+				       bool wrap, uint16_t fg, uint16_t bg,
+				       bool bDraw, int16_t *pX2)
 {
   uint32_t ucode;
   const uint8_t *glyph;
   uint8_t w,h;
-  uint8_t s = textsize < 1 ? 0 : textsize;
+  uint8_t sx = textsize_x < 1 ? 0 : textsize_x;
+  uint8_t sy = textsize_y < 1 ? 0 : textsize_y;
   
   if(pX2) *pX2 = *pX;
   
   if(c == '\n'){
     uint8_t h;
     if(m_fontx->getGlyph(' ', NULL, NULL, &h))
-      *pY += (h + m_spaceY) * s;
+      *pY += (h + m_spaceY) * sy;
     *pX = 0;
-    lineFeedHook(pX, pY, (h + m_spaceY) * s);
+    lineFeedHook(pX, pY, (h + m_spaceY) * sy);
   }
   else if(c != '\r'){
     if(m_u8d.decode(c, &ucode) && m_fontx->getGlyph(ucode, &glyph, &w, &h)){
-      if(wrap && (*pX + (w + m_spaceX) * s > _width)){
+      if(wrap && (*pX + (w + m_spaceX) * sx > _width)){
 	*pX = 0;
 	if(pX2) *pX2 = 0;
-	*pY += (h + m_spaceY) * s;
-	lineFeedHook(pX, pY, (h + m_spaceY * s));
+	*pY += (h + m_spaceY) * sy;
+	lineFeedHook(pX, pY, (h + m_spaceY * sy));
       }
       if(bDraw)
-	drawFontxGlyph(glyph, w, h, *pX, *pY, textsize, wrap, fg, bg);
-      *pX += (w + m_spaceX) * textsize;
+	drawFontxGlyph(glyph, w, h, *pX, *pY, textsize_x, textsize_y,
+		       wrap, fg, bg);
+      *pX += (w + m_spaceX) * sy;
     }
   }
 }
@@ -116,13 +120,15 @@ void Humblesoft_GFX::process_utf8_byte(uint8_t c, int16_t *pX, int16_t *pY,
 void
 Humblesoft_GFX::drawFontxGlyph(const uint8_t *glyph,uint8_t w,uint8_t h,
 			       int16_t cx, int16_t cy,
-			       uint8_t textsize, boolean /* wrap */,
+			       uint8_t textsize_x, uint8_t textsize_y,
+			       boolean /* wrap */,
 			       uint16_t textcolor, uint16_t textbgcolor)
 {
   const uint8_t *gp;
   uint8_t x,y;
   uint16_t xp, yp;
-  uint8_t s = textsize < 1 ? 1 : textsize;
+  uint8_t sx = textsize_x < 1 ? 1 : textsize_x;
+  uint8_t sy = textsize_y < 1 ? 1 : textsize_y;
 
   if(glyph == NULL) return;
   
@@ -134,14 +140,14 @@ Humblesoft_GFX::drawFontxGlyph(const uint8_t *glyph,uint8_t w,uint8_t h,
       uint8_t d = pgm_read_byte(&gp[x / 8]);
       for (int i = 0, m = 0x80; i < 8 && i + x < w; i++, m >>= 1) {
 	if (d & m)
-	  fillRect(xp, yp, s, s , textcolor);
+	  fillRect(xp, yp, sx, sy , textcolor);
 	else if(textcolor != textbgcolor)
-	  fillRect(xp, yp, s, s , textbgcolor);
-	xp += s;
+	  fillRect(xp, yp, sx, sy, textbgcolor);
+	xp += sx;
       }
     }
     gp += (w + 7) / 8;
-    yp += s;
+    yp += sy;
   }
 }
 
@@ -159,7 +165,8 @@ void Humblesoft_GFX::getTextBounds(const char *string, int16_t x0, int16_t y0,
     x = min_x = max_x = x2 = x0;
     y = min_y = max_y = y0;
     while(*p){
-      process_utf8_byte(*p++, &x, &y, textsize, wrap, 0, 0, false, &x2);
+      process_utf8_byte(*p++, &x, &y, textsize_x, textsize_y, wrap,
+			0, 0, false, &x2);
 
       if(x < min_x) min_x = x;
       if(x > max_x) max_x = x;
@@ -171,7 +178,7 @@ void Humblesoft_GFX::getTextBounds(const char *string, int16_t x0, int16_t y0,
 
     uint8_t th;
     if(m_fontx->getGlyph(' ', NULL, NULL, &th))
-      max_y += th * textsize;
+      max_y += th * textsize_y;
 
     *x1 = min_x;
     *y1 = min_y;

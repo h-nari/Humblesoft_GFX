@@ -128,8 +128,8 @@ getCursorX(),getCursorY()なども使わなければ
 void moveCursor(int16_t rx, int16_t ry);
 ```
 
-# 今後
+## 改版履歴
 
-なにか便利な機能があれば、
-今後もHumblesoft_GFXに追加していく
-つもりです。
+### 2019年9月12日(木) v1.1
+
+- Adafuit_GFX_Library 1.5.6に対応しました。
